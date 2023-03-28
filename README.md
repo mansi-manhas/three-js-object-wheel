@@ -3,6 +3,11 @@ To create an image carousel in the form of object wheel using three.js JavaScrip
 
 ## Live Site
 
+Scroll up or down and see the carousel move
+
+Demo: https://vermillion-puppy-1ca6b0.netlify.app/
+
+
 ## Screenshot
 ![image](https://user-images.githubusercontent.com/18692751/228289498-68bc5661-0ef9-4b9a-ad20-2ddf51e796c1.png)
 
