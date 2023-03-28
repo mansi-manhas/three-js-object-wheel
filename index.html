@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./three.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        margin-top: 500px;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        position: absolute;
+        left: 50%;
+        right: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const image_radius = 100;
+      const number_of_images = 8;
+      const radius = 400;
+      const radian_interval = (2.0 * Math.PI) / number_of_images;
+      const center_of_wheel = {
+        x: 0,
+        y: 0,
+      };
+
+      /********  SCENE & OBJECTS   ************/
+      // Create the scene and a camera to view it
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffbee8);
+
+      const group_cards = new THREE.Group();
+      let loader = null;
+      let texture = null;
+      let material = null;
+      let circle = null;
+      let mesh = null;
+
+      let img_name = 1;
+
+      for (let i = 0; i < number_of_images; i++) {
+        // Create a texture loader so we can load our image file
+        loader = new THREE.TextureLoader();
+        texture = loader.load(`assets/${img_name}.jpg`);
+        texture.minFilter = THREE.LinearFilter; //to sharpen it
+
+        // Load an image file into a custom material
+        material = new THREE.MeshBasicMaterial({
+          map: texture,
+          transparent: true,
+          opacity: 1,
+        });
+
+        circle = new THREE.CircleGeometry(image_radius, 100);
+        mesh = new THREE.Mesh(circle, material);
+
+        mesh.material.side = THREE.DoubleSide;
+
+        mesh.position.set(
+          center_of_wheel.x + Math.cos(radian_interval * i) * radius,
+          center_of_wheel.y + Math.sin(radian_interval * i) * radius,
+          0
+        );
+
+        // add the image to the group
+        group_cards.add(mesh);
+        img_name++;
+      }
+
+      // add group to scene
+      scene.add(group_cards);
+
+      /**** CAMERA ******/
+      // Specify the portion of the scene visible at any time (in degrees)
+      let fieldOfView = 75;
+
+      let aspectRatio = window.innerWidth / window.innerHeight;
+      let nearPlane = 0.1;
+      let farPlane = 1000;
+      let camera = new THREE.PerspectiveCamera(
+        fieldOfView,
+        aspectRatio,
+        nearPlane,
+        farPlane
+      );
+      camera.position.z = 1000;
+
+      /**** RENDERER ******/
+      let renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Add the canvas to the DOM
+      document.querySelector("body").appendChild(renderer.domElement);
+
+      let scroll_speed = 0.0;
+      window.addEventListener("wheel", (event) => {
+        scroll_speed = event.deltaY * (Math.PI / 180) * 0.2;
+        group_cards.rotation.z += -1.0 * scroll_speed;
+        for (let i = 0; i < group_cards.children.length; i++) {
+          group_cards.children[i].rotation.z += scroll_speed;
+        }
+      });
+      requestAnimationFrame(animate);
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>
